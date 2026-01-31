@@ -38,13 +38,12 @@ public final class OrElseRule extends AbstractCompositeRule {
                 if (parameterExtractor != null) {
                     combinedGlobalParam.putAll(parameterExtractor.extract(input, globalParams));
                 }
-                globalParams = combinedGlobalParam;
                 for (Rule rule : super.getRules()) {
-                    rule.execute(input, globalParams, evaluationContext);
+                    rule.execute(input, combinedGlobalParam, evaluationContext);
                     rulesExecuted ++;
                     RuleTrace ruleTrace = evaluationContext.getCurrentTrace();
                     if (ruleTrace.getChildren() != null) {
-                        compositeResult = ruleTrace.getChildren().stream().allMatch(RuleTrace::isResult);
+                        compositeResult = ruleTrace.getChildren().stream().anyMatch(RuleTrace::isResult);
                         if (compositeResult) { //Or else condition -> short circuit when any child returns true
                             break;
                         }

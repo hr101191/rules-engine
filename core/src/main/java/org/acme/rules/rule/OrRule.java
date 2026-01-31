@@ -11,7 +11,6 @@ import org.jspecify.annotations.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public final class OrRule extends AbstractCompositeRule {
@@ -30,7 +29,6 @@ public final class OrRule extends AbstractCompositeRule {
         evaluationContext.enterRule(super.getRuleName());
         RuleExecutionStatus executionStatus = RuleExecutionStatus.SUCCESS;
         boolean compositeResult = false;
-        AtomicBoolean finalResult = new AtomicBoolean(false);
         int rulesExecuted = 0;
         int size = super.getRules().size();
         try {
@@ -40,16 +38,12 @@ public final class OrRule extends AbstractCompositeRule {
                 if (parameterExtractor != null) {
                     combinedGlobalParam.putAll(parameterExtractor.extract(input, globalParams));
                 }
-                globalParams = combinedGlobalParam;
                 for (Rule rule : super.getRules()) {
-                    rule.execute(input, globalParams, evaluationContext);
+                    rule.execute(input, combinedGlobalParam, evaluationContext);
                     rulesExecuted ++;
                     RuleTrace ruleTrace = evaluationContext.getCurrentTrace();
                     if (ruleTrace.getChildren() != null) {
-                        compositeResult = ruleTrace.getChildren().stream().allMatch(RuleTrace::isResult);
-                        if (compositeResult) { //Or condition -> best effort execution of all rules regardless of previous result
-                            finalResult.set(compositeResult);
-                        }
+                        compositeResult = ruleTrace.getChildren().stream().anyMatch(RuleTrace::isResult); //Or condition -> best effort execution of all rules regardless of previous result
                     }
                 }
             } else {
@@ -57,14 +51,14 @@ public final class OrRule extends AbstractCompositeRule {
             }
             long end = System.nanoTime() - start;
             super.recordMetrics(end, executionStatus);
-            log.info("Rule name: {} - Successfully executed Composite Rule Expression [OR] | Result: {}", super.getRuleName(), finalResult.get());
-            return evaluationContext.exitRule(finalResult.get(), rulesExecuted != size, end, executionStatus);
+            log.info("Rule name: {} - Successfully executed Composite Rule Expression [OR] | Result: {}", super.getRuleName(), compositeResult);
+            return evaluationContext.exitRule(compositeResult, rulesExecuted != size, end, executionStatus);
         } catch (Exception ex) {
             long end = System.nanoTime() - start;
             log.error("Rule name: {} - Composite Rule Expression [OR] execution failed. Stacktrace: ", super.getRuleName(), ex);
             executionStatus = RuleExecutionStatus.ERROR;
             super.recordMetrics(end, executionStatus);
-            return evaluationContext.exitRule(finalResult.get(), rulesExecuted != size, end, executionStatus);
+            return evaluationContext.exitRule(compositeResult, rulesExecuted != size, end, executionStatus);
         }
     }
 }

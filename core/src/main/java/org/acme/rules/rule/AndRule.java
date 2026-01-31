@@ -38,9 +38,8 @@ public final class AndRule extends AbstractCompositeRule {
                 if (parameterExtractor != null) {
                     combinedGlobalParam.putAll(parameterExtractor.extract(input, globalParams));
                 }
-                globalParams = combinedGlobalParam;
                 for (Rule rule : super.getRules()) {
-                    rule.execute(input, globalParams, evaluationContext);
+                    rule.execute(input, combinedGlobalParam, evaluationContext);
                     rulesExecuted ++;
                     RuleTrace ruleTrace = evaluationContext.getCurrentTrace();
                     if (ruleTrace.getChildren() != null) {

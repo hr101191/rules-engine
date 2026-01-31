@@ -1,5 +1,7 @@
 package org.acme.rules.workflow;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -15,17 +17,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 @Slf4j
 public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private final TaskExecutor taskExecutor;
+    private final MeterRegistry meterRegistry;
 
     @Builder
-    public WorkflowExecutorImpl(@NonNull Vertx vertx) {
+    public WorkflowExecutorImpl(@NonNull Vertx vertx, boolean enableMetrics) {
         Objects.requireNonNull(vertx);
         this.taskExecutor = TaskExecutor.builder().vertx(vertx).build();
+        if (enableMetrics) {
+            this.meterRegistry = Metrics.globalRegistry;
+        } else {
+            this.meterRegistry = null;
+        }
     }
 
     @Override
@@ -37,6 +46,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     @Override
     public Future<List<RuleTrace>> execute(@NonNull Workflow workflow, @NonNull Map<String, Object> input) {
         Promise<List<RuleTrace>> promise = Promise.promise();
+        long start = System.nanoTime();
         try {
             Objects.requireNonNull(workflow);
             Objects.requireNonNull(input);
@@ -85,7 +95,18 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
         } catch (Exception ex) {
             promise.fail(ex);
         }
-        return promise.future();
+        return promise.future()
+                .onComplete(asyncResult -> {
+                    if (meterRegistry != null) {
+                        long end = System.nanoTime() - start;
+                        log.info("Workflow [{}] - executed completed in {} nanoseconds.", workflow.getWorkflowDescriptor().getWorkflowName(), end);
+                        if (asyncResult.succeeded()) {
+                            meterRegistry.timer("workflow_execution_time", "realm", workflow.getRealm(), "workflow_name", workflow.getWorkflowDescriptor().getWorkflowName(), "status", "successful").record(end, TimeUnit.NANOSECONDS);
+                        } else {
+                            meterRegistry.timer("workflow_execution_time", "realm", workflow.getRealm(), "workflow_name", workflow.getWorkflowDescriptor().getWorkflowName(), "status", "failed").record(end, TimeUnit.NANOSECONDS);
+                        }
+                    }
+                });
     }
 
 }

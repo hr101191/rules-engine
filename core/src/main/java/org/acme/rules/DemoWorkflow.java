@@ -108,7 +108,7 @@ public class DemoWorkflow {
                                         "ruleName": "amount more than 10 in list (long)",
                                         "enabled": true,
                                         "ruleExpressionType": "CEL",
-                                        "expression": "[1, 2, 3, 4, 5].sum() > 10"
+                                        "expression": "[1, 2, 5].sum() > 10"
                                     },
                                     {
                                         "type": "EXPRESSION",
@@ -146,7 +146,7 @@ public class DemoWorkflow {
                                 "ruleName": "transaction amount > 20",
                                 "enabled": true,
                                 "ruleExpressionType": "CEL",
-                                "expression": "root.txnAmt > 20.0"
+                                "expression": "root.txnAmt > 20.0 && root.historicalTxnAmt.sum() > 100.0"
                             }
                         ]
                     }
