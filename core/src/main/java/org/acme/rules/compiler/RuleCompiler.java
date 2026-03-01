@@ -12,6 +12,9 @@ import org.acme.rules.rule.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.acme.rules.model.RuleExpressionType.CEL;
+import static org.acme.rules.model.RuleExpressionType.JS;
+
 @Slf4j
 public class RuleCompiler {
 
@@ -25,6 +28,7 @@ public class RuleCompiler {
         return switch (ruleDescriptor) {
             case ExpressionRuleDescriptor expressionRuleDescriptor -> compileExpressionRule(expressionRuleDescriptor, celRuntime, celCompilerBuilderCustomizers, globalParamNames);
             case CompositeRuleDescriptor compositeRuleDescriptor -> compileCompositeRule(compositeRuleDescriptor, celRuntime, celCompilerBuilderCustomizers, globalParamNames);
+            default -> throw new IllegalArgumentException("Unknown rule descriptor type: " + ruleDescriptor.getClass().getName());
         };
     }
 

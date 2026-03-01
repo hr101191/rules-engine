@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.acme.rules.model.CompositeRuleDescriptor;
 import org.acme.rules.model.RuleExecutionStatus;
 import org.acme.rules.model.RuleTrace;
-import org.acme.rules.model.RuleTraceMetadata;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;

@@ -32,6 +32,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.immutables</groupId>
+			<artifactId>value-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
@@ -91,10 +96,21 @@
 				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
 					<parameters>true</parameters>
-					<annotationProcessors>
-						<annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
-						<annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-					</annotationProcessors>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+						<path>
+							<groupId>org.immutables</groupId>
+							<artifactId>value</artifactId>
+						</path>
+						<path>
+							<groupId>io.vertx</groupId>
+							<artifactId>vertx-codegen</artifactId>
+							<classifier>processor</classifier>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 		</plugins>

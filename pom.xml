@@ -11,6 +11,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<quarkus.platform.version>3.31.1</quarkus.platform.version>
 		<cel.version>0.11.1</cel.version>
+		<immutables.version>2.12.1</immutables.version>
 		<lombok.version>1.18.42</lombok.version>
 		<os.maven.plugin.version>1.7.1</os.maven.plugin.version>
 		<build.helper.maven.plugin.version>3.6.1</build.helper.maven.plugin.version>
@@ -36,6 +37,13 @@
 				<groupId>dev.cel</groupId>
 				<artifactId>cel</artifactId>
 				<version>${cel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.immutables</groupId>
+				<artifactId>bom</artifactId>
+				<version>${immutables.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>

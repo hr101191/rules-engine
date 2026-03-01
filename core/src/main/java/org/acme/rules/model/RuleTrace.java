@@ -1,32 +1,71 @@
 package org.acme.rules.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.json.annotations.JsonGen;
+import io.vertx.core.json.JsonObject;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.immutables.value.Value;
 
+import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
-@Getter
-@Setter
-@ToString
-public class RuleTrace {
+@DataObject
+@JsonGen(inheritConverter = true)
+@Value.Modifiable
+@Value.Style(
+        nullableAnnotation = "org.jspecify.annotations.Nullable",
+        jdk9Collections = true,
+        builtinContainerAttributes = false,
+        passAnnotations = {
+                DataObject.class,
+                JsonGen.class
+        },
+        get = {
+                "get*",
+                "is*"
+        }
+)
+@JsonSerialize(as = ModifiableRuleTrace.class)
+@JsonDeserialize(as = ModifiableRuleTrace.class)
+public interface RuleTrace {
 
-    private String ruleName;
-    private boolean result;
-    private boolean shortCircuited;
-    private long durationNanos;
-    private RuleExecutionStatus status;
-    private Map<String, Object> metadata;
-    private List<RuleTrace> children;
+    String getRuleName();
+    boolean isResult();
+    boolean isShortCircuited();
+    long getDurationNanos();
 
-    public RuleTrace(String ruleName) {
-        this.ruleName = ruleName;
+    @Nullable
+    RuleExecutionStatus getStatus();
+
+    @Nullable
+    List<RuleTrace> getChildren();
+
+
+    default JsonObject toJson() {
+        ModifiableRuleTrace modifiableRuleTrace = ModifiableRuleTrace.create().from(this);
+        JsonObject jsonObject = new JsonObject();
+        ModifiableRuleTraceConverter.toJson(modifiableRuleTrace, jsonObject);
+        return jsonObject;
     }
 
-    public Stream<RuleTrace> flattened() {
-        return Stream.concat(Stream.of(this), children == null ? Stream.empty() : children.stream().flatMap(RuleTrace::flattened));
+    class JsonFactory {
+
+        public static JsonObject serialize(RuleTrace ruleTrace) {
+            ModifiableRuleTrace modifiableRuleTrace = ModifiableRuleTrace.create().from(ruleTrace);
+            JsonObject jsonObject = new JsonObject();
+            ModifiableRuleTraceConverter.toJson(modifiableRuleTrace, jsonObject);
+            return jsonObject;
+        }
+
+        public static RuleTrace deserialize(JsonObject jsonObject) {
+            ModifiableRuleTrace modifiableRuleTrace = ModifiableRuleTrace.create();
+            ModifiableRuleTraceConverter.fromJson(jsonObject, modifiableRuleTrace);
+            return modifiableRuleTrace;
+        }
+
     }
 
 }

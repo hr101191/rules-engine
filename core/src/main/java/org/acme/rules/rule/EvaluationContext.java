@@ -1,5 +1,6 @@
 package org.acme.rules.rule;
 
+import org.acme.rules.model.ModifiableRuleTrace;
 import org.acme.rules.model.RuleExecutionStatus;
 import org.acme.rules.model.RuleTrace;
 
@@ -9,7 +10,7 @@ import java.util.Deque;
 
 public class EvaluationContext {
 
-    private final Deque<RuleTrace> stack;
+    private final Deque<ModifiableRuleTrace> stack;
     private RuleTrace root;
 
     public static EvaluationContext create() {
@@ -21,11 +22,12 @@ public class EvaluationContext {
     }
 
     void enterRule(String ruleName) {
-        RuleTrace ruleTrace = new RuleTrace(ruleName);
+        ModifiableRuleTrace ruleTrace = ModifiableRuleTrace.create();
+        ruleTrace.setRuleName(ruleName);
         if (stack.isEmpty()) {
             root = ruleTrace;
         } else {
-            RuleTrace firstElementFromStack = stack.peek();
+            ModifiableRuleTrace firstElementFromStack = stack.peek();
             if (firstElementFromStack.getChildren() == null) {
                 firstElementFromStack.setChildren(new ArrayList<>());
             }
@@ -39,7 +41,7 @@ public class EvaluationContext {
     }
 
     RuleTrace exitRule(boolean result, boolean shortCircuited, long durationNanos, RuleExecutionStatus status) {
-        RuleTrace ruleTrace = stack.pop();
+        ModifiableRuleTrace ruleTrace = stack.pop();
         ruleTrace.setResult(result);
         ruleTrace.setShortCircuited(shortCircuited);
         ruleTrace.setDurationNanos(durationNanos);

@@ -1,36 +1,83 @@
 package org.acme.rules.model;
 
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.json.annotations.JsonGen;
+import io.vertx.core.json.JsonObject;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.immutables.value.Value;
 
-import java.util.List;
+@DataObject
+@JsonGen(inheritConverter = true)
+@Value.Immutable
+@Value.Modifiable
+@Value.Style(
+        nullableAnnotation = "org.jspecify.annotations.Nullable",
+        jdk9Collections = true,
+        builtinContainerAttributes = false,
+        passAnnotations = {
+                DataObject.class,
+                JsonGen.class
+        },
+        get = {
+                "get*",
+                "is*"
+        }
+)
+@JsonSerialize(as = ImmutableExpressionRuleDescriptor.class)
+@JsonDeserialize(as = ImmutableExpressionRuleDescriptor.class)
+public interface ExpressionRuleDescriptor extends RuleDescriptor {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-public final class ExpressionRuleDescriptor implements RuleDescriptor {
+    static ImmutableExpressionRuleDescriptor.Builder builder() {
+        return ImmutableExpressionRuleDescriptor.builder();
+    }
 
     @NotBlank
-    private String ruleName;
-
-    @Valid
-    private ScopedParametersDescriptor localParametersDescriptor;
-
-    @NotNull
-    private RuleExpressionType ruleExpressionType;
+    RuleExpressionType getRuleExpressionType();
 
     @NotBlank
-    private String expression;
+    String getExpression();
 
-    private boolean enabled;
+    @Value.Auxiliary
+    @GenIgnore
+    @Schema(hidden = true)
+    default boolean isImmutable() {
+        return this instanceof ImmutableExpressionRuleDescriptor;
+    }
 
-    private List<@Valid ActionDescriptor> actions;
+    default ExpressionRuleDescriptor toImmutable() {
+        return ImmutableExpressionRuleDescriptor.copyOf(this);
+    }
 
-    private RuleTraceMetadata ruleTraceMetadata;
+    default ExpressionRuleDescriptor toModifiable() {
+        return ModifiableExpressionRuleDescriptor.create().from(this);
+    }
+
+    default JsonObject toJson() {
+        ModifiableExpressionRuleDescriptor modifiableExpressionRuleDescriptor = ModifiableExpressionRuleDescriptor.create().from(this);
+        JsonObject jsonObject = new JsonObject();
+        ModifiableExpressionRuleDescriptorConverter.toJson(modifiableExpressionRuleDescriptor, jsonObject);
+        return jsonObject;
+    }
+
+    class JsonFactory {
+
+        public static JsonObject serialize(ExpressionRuleDescriptor expressionRuleDescriptor) {
+            ModifiableExpressionRuleDescriptor modifiableExpressionRuleDescriptor = ModifiableExpressionRuleDescriptor.create().from(expressionRuleDescriptor);
+            JsonObject jsonObject = new JsonObject();
+            ModifiableExpressionRuleDescriptorConverter.toJson(modifiableExpressionRuleDescriptor, jsonObject);
+            return jsonObject;
+        }
+
+        public static ExpressionRuleDescriptor deserialize(JsonObject jsonObject) {
+            ModifiableExpressionRuleDescriptor modifiableExpressionRuleDescriptor = ModifiableExpressionRuleDescriptor.create();
+            ModifiableExpressionRuleDescriptorConverter.fromJson(jsonObject, modifiableExpressionRuleDescriptor);
+            return modifiableExpressionRuleDescriptor;
+        }
+
+    }
 
 }
