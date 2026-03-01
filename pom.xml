@@ -10,6 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<quarkus.platform.version>3.31.1</quarkus.platform.version>
+		<vertx.version>4.5.24</vertx.version>
 		<cel.version>0.11.1</cel.version>
 		<immutables.version>2.12.1</immutables.version>
 		<lombok.version>1.18.42</lombok.version>
@@ -22,6 +23,7 @@
 	</properties>
 	<modules>
 		<module>core</module>
+		<module>reactive</module>
 		<module>web</module>
 	</modules>
 	<dependencyManagement>
