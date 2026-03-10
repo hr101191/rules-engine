@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @DataObject
-//@JsonTypeInfo(use=JsonTypeInfo.Id.NONE)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value =  ExpressionRuleDescriptor.class, name = "EXPRESSION"),

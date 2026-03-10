@@ -4,7 +4,7 @@ import dev.cel.runtime.CelRuntime;
 import lombok.Builder;
 import lombok.Getter;
 import org.acme.rules.cel.CelCompilerBuilderCustomizer;
-import org.acme.rules.compiler.RuleCompiler;
+import org.acme.rules.RuleCompiler;
 import org.acme.rules.model.RuleDescriptor;
 import org.acme.rules.model.WorkflowDescriptor;
 import org.acme.rules.parameter.ParameterExtractor;

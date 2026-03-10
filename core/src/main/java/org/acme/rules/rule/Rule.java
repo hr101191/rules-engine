@@ -1,10 +1,12 @@
 package org.acme.rules.rule;
 
+import io.vertx.codegen.annotations.VertxGen;
 import org.acme.rules.model.RuleDescriptor;
 import org.acme.rules.model.RuleTrace;
 
 import java.util.Map;
 
+@VertxGen
 public sealed interface Rule permits AbstractCompositeRule, AbstractExpressionRule {
 
     RuleTrace execute(Map<String, Object> input, Map<String, Object> globalParams, EvaluationContext evaluationContext);

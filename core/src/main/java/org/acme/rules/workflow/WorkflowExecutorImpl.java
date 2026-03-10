@@ -68,7 +68,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
                             .compose(globalParams -> {
                                 List<Callable<RuleTrace>> tasks = workflowToExecute.getRules()
                                         .stream()
-                                        .map(rule -> (Callable<RuleTrace>) () -> rule.execute(input, globalParams, new EvaluationContext()))
+                                        .map(rule -> (Callable<RuleTrace>) () -> rule.execute(input, globalParams, EvaluationContext.create()))
                                         .toList();
                                 return taskExecutor.execute(tasks);
                             });

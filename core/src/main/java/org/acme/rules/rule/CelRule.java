@@ -20,6 +20,7 @@ import org.acme.rules.model.ScopedParameter;
 import org.acme.rules.model.ScopedParametersDescriptor;
 import org.acme.rules.parameter.ParameterExtractor;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.*;
@@ -32,7 +33,7 @@ public final class CelRule extends AbstractExpressionRule {
     private final CelRuntime.Program celProgram;
 
     @Builder
-    public CelRule(@NonNull ExpressionRuleDescriptor ruleDescriptor, boolean metricsEnabled, @NonNull CelRuntime celRuntime, ParameterExtractor parameterExtractor, List<String> globalParamNames, List<CelCompilerBuilderCustomizer> celCompilerBuilderCustomizers) throws CelValidationException, CelEvaluationException {
+    public CelRule(@NonNull ExpressionRuleDescriptor ruleDescriptor, boolean metricsEnabled, @NonNull CelRuntime celRuntime, @Nullable ParameterExtractor parameterExtractor, @Nullable List<String> globalParamNames, @Nullable List<CelCompilerBuilderCustomizer> celCompilerBuilderCustomizers) throws CelValidationException, CelEvaluationException {
         super(ruleDescriptor, metricsEnabled);
         this.parameterExtractor = parameterExtractor;
         Objects.requireNonNull(celRuntime);
