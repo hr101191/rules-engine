@@ -1,6 +1,8 @@
 package org.acme.rules.parameter;
 
 import dev.cel.runtime.CelRuntime;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.VertxGen;
 import org.acme.rules.cel.CelCompilerBuilderCustomizer;
 import org.acme.rules.model.ScopedParametersDescriptor;
 import org.jspecify.annotations.NonNull;
@@ -10,10 +12,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+@VertxGen
 public interface ParameterExtractor {
 
+    @GenIgnore
     Logger log = LoggerFactory.getLogger(ParameterExtractor.class);
 
+    @GenIgnore
     static ParameterExtractor buildParameterExtractor(@NonNull ScopedParametersDescriptor scopedParametersDescriptor, @NonNull CelRuntime celRuntime, List<CelCompilerBuilderCustomizer> celCompilerBuilderCustomizerList) {
         return switch (scopedParametersDescriptor.getExpressionType()) {
             case CEL -> {
